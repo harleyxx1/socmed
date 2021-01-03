@@ -9,6 +9,10 @@ connect()
 
 const app = express();
 
+app.get('/', (req, res) => {
+    res.send('Api is runing');
+})
+
 app.use('/api/users', userRoute)
 
 app.listen(5000, console.log('ahah'))

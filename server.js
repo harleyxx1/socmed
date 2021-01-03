@@ -1,8 +1,10 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const connect = require('./backend/config/db');
 
+const connect = require('./backend/config/db');
+const { errorHandler } = require('./backend/middleware/errorMiddleware');
 const userRoute = require('./backend/routes/userRoutes')
+
 dotenv.config();
 
 connect()
@@ -15,6 +17,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRoute)
 
-const PORT = process.env.PORT || 5000;
+app.use(errorHandler);
 
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log(`App is runing at port ${PORT}`))

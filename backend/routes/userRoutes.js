@@ -32,5 +32,8 @@ const upload = multer({
 
 router.route('/register').post(upload.single('avatar'), registerUser)
 router.route('/login').post(upload.none(), loginUser)
+router.get('/', (req, res) => {
+    res.send('users api')
+})
 
 module.exports = router;

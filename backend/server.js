@@ -15,4 +15,6 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRoute)
 
-app.listen(5000, console.log('ahah'))
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, console.log(`App is runing at port ${PORT}`))

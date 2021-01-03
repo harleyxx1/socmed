@@ -31,6 +31,6 @@ const upload = multer({
 });
 
 router.route('/register').post(upload.single('avatar'), registerUser)
-router.post('/login', loginUser)
+router.route('/login').post(upload.none(), loginUser)
 
 module.exports = router;

@@ -1,8 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const connect = require('./config/db');
+const connect = require('./backend/config/db');
 
-const userRoute = require('./routes/userRoutes')
+const userRoute = require('./backend/routes/userRoutes')
 dotenv.config();
 
 connect()

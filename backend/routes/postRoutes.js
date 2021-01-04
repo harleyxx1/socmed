@@ -1,7 +1,10 @@
-const express =require('express');
+const express = require('express');
 const multer = require('multer');
-
-const { registerUser, loginUser } = require('../controllers/userControllers');
+const {
+    getAllPosts,
+    getUserPosts,
+    submitPost
+} = require('../controllers/postControllers');
 
 const router = express.Router();
 
@@ -10,7 +13,7 @@ const storage = multer.diskStorage({
         cb(null, './uploads/')
     },
     filename: function (req, file, cb) {
-        cb(null,  new Date().toISOString().replace(/:/g, '-') + file.originalname)
+        cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
     }
 })
 
@@ -25,12 +28,13 @@ const filter = (req, file, cb) => {
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 1024 * 1024 * 5
+        fileSize: 1024 * 1024 * 15
     },
     fileFilter: filter
 });
 
-router.route('/register').post(upload.single('avatar'), registerUser)
-router.route('/login').post(loginUser);
+router.route('/').get(getAllPosts)
+router.route('/submitpost').post(upload.array('postImage', 20), submitPost)
+router.route('/userpost').post(getUserPosts)
 
-module.exports = router;
+module.exports = router

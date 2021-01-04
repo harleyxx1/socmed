@@ -1,10 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const bodyParser = require('body-parser');
 
 const connect = require('./backend/config/db');
 const { errorHandler } = require('./backend/middleware/errorMiddleware');
-const userRoute = require('./backend/routes/userRoutes')
+const userRoutes = require('./backend/routes/userRoutes');
+const postRoutes = require('./backend/routes/postRoutes');
+const commentRoutes = require('./backend/routes/commentRoutes');
 
 dotenv.config();
 
@@ -12,16 +13,17 @@ connect();
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}))
+app.use(express.json());
+
+app.use(express.static('uploads'));
 
 app.get('/', (req, res) => {
-    res.send('Api is runing');
+    res.send('Api is running')
 });
 
-app.use('/api/users', userRoute);
+app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 app.use(errorHandler);
 

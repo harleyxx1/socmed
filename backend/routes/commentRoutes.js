@@ -1,7 +1,9 @@
-const express =require('express');
+const express = require('express');
 const multer = require('multer');
 
-const { registerUser, loginUser } = require('../controllers/userControllers');
+const {
+    addComment
+} = require('../controllers/commentControllers');
 
 const router = express.Router();
 
@@ -10,7 +12,7 @@ const storage = multer.diskStorage({
         cb(null, './uploads/')
     },
     filename: function (req, file, cb) {
-        cb(null,  new Date().toISOString().replace(/:/g, '-') + file.originalname)
+        cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
     }
 })
 
@@ -30,7 +32,7 @@ const upload = multer({
     fileFilter: filter
 });
 
-router.route('/register').post(upload.single('avatar'), registerUser)
-router.route('/login').post(loginUser);
+
+router.route('/submitcomment').post(upload.array('commentImage'), addComment);
 
 module.exports = router;

@@ -2,10 +2,10 @@ const User = require('../model/userModel');
 const asyncHandler = require('express-async-handler');
 
 const registerUser = asyncHandler(async (req, res) => {
-    let path;
+    let avatar;
 
     if (req.file) {
-        path = req.file.path
+        avatar = req.file.path
     }
 
     const {
@@ -23,7 +23,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!user) {
         const createdUser = await User.create({
             age,
-            avatar: path,
+            avatar,
             birthday,
             email,
             firstname,
@@ -34,7 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
         res.json({
             age: createdUser.age,
-            avatar: createdUser.avatar ? createdUser.avatar : undefined,
+            avatar: createdUser.avatar,
             birthday: createdUser.birthday,
             email: createdUser.email,
             firstname: createdUser.firstname,
@@ -49,15 +49,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    const exists = await User.findOne({ email });
 
-    if (exists) {
-        const user = exists.select('-password');
+    const user = await User.findOne({ email }).populate('-password');
+
+    if (user && (await user.checkPassword(password))) {
         res.json(user)
-    }
-    else {
+    } else {
         res.status(400);
-        throw new Error('Invalid credensitals.')
+        throw new Error('Invalid credentials');
     }
 })
 

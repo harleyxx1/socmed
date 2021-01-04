@@ -33,7 +33,6 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     }
-
 }, {
     timestamps: true
 })
@@ -47,7 +46,7 @@ userSchema.pre('save', async function (next) {
     this.password = await bcryptjs.hash(this.password, salt)
 })
 
-userSchema.method.checkPassword = async (enteredPass) => {
+userSchema.methods.checkPassword = async function (enteredPass) {
     return await bcryptjs.compare(enteredPass, this.password);
 }
 

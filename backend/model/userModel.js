@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema({
         required: true
     },
     avatar: {
-        type: String,
+        type: Object,
     },
     birthday: {
         type: Date,
@@ -27,11 +27,11 @@ const userSchema = mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     username: {
         type: String,
-        required: true
+        required: true,
     }
 }, {
     timestamps: true

@@ -18,16 +18,16 @@ const addComment = ansyncHandler(async (req, res) => {
         
         if (req.files.length > 0) {
             req.files.forEach(file => {
-                commentImage.push({
-                    "originalname": "IMG_20210103_192151.jpg",
-                    "encoding": "7bit",
-                    "mimetype": "image/jpeg",
-                    "filename": "2021-01-04T12-06-06.961ZIMG_20210103_192151.jpg",
-                    "size": 3833758,
+                postImage.push({
+                    "originalname": file.originalname,
+                    "encoding": file.encoding,
+                    "mimetype": file.mimetype,
+                    "filename": file.filename,
+                    "size": file.size,
                     "url": `${hostURL}${file.filename}`
                 })
             })
-        }    
+        } 
 
         const comment = await Comment.create({
             postId,

@@ -1,23 +1,54 @@
 const Post = require('../model/postModel');
-const Comment = require('../model/commentModel');
 const asyncHandler = require('express-async-handler');
 
 const getAllPosts = asyncHandler(async (req, res) => {
-    const posts = await Post.find({});
+    const posts = await Post.find({}).populate([
+        {
+            path: 'postedBy',
+            select: '-password'
+        },
+        {
+            path: 'comment',
+            populate: [{
+                path: 'replies',
+                select: '-replies',
+                populate: {
+                    path: 'commentedBy',
+                    select: '-password'
+                }
+            }, {
+                path: 'commentedBy',
+                select: '-password'
+            }]
+        }
+    ])
     res.json(posts)
 });
 
 const getUserPosts = asyncHandler(async (req, res) => {
-    const { userId } = req.body;
-    const posts = await Post.find({ postedBy: userId }).populate({
-        path: 'comment',
-        populate: {
-            path: 'replies',
-            select: '-replies'
+    const { postedBy } = req.body;
+    const posts = await Post.find({ postedBy }).populate([
+        {
+            path: 'postedBy',
+            select: '-password'
+        },
+        {
+            path: 'comment',
+            populate: [{
+                path: 'replies',
+                select: '-replies',
+                populate: {
+                    path: 'commentedBy',
+                    select: '-password'
+                }
+            }, {
+                path: 'commentedBy',
+                select: '-password'
+            }]
         }
-    });
+    ])
 
-    res.json(posts)    
+    res.json(posts)
 });
 
 const submitPost = asyncHandler(async (req, res) => {

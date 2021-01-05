@@ -10,7 +10,7 @@ const userSchema = mongoose.Schema({
         type: Object,
     },
     birthday: {
-        type: Date,
+        type: String,
         required: true
     },
     email: {

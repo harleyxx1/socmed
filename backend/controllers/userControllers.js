@@ -2,17 +2,19 @@ const User = require('../model/userModel');
 const asyncHandler = require('express-async-handler');
 
 const registerUser = asyncHandler(async (req, res) => {
-    let avatar;
+    let avatar = {};
 
     const hostURL = req.protocol + '://' + req.get('host') + '/'
 
-    avatar = {
-        "originalname": req.file.originalname,
-        "encoding": req.file.encoding,
-        "mimetype": req.file.mimetype,
-        "filename": req.file.filename,
-        "size": req.file.size,
-        "url": `${hostURL}${req.file.filename}`
+    if (req.file) {
+        avatar = {
+            "originalname": req.file.originalname,
+            "encoding": req.file.encoding,
+            "mimetype": req.file.mimetype,
+            "filename": req.file.filename,
+            "size": req.file.size,
+            "url": `${hostURL}${req.file.filename}`
+        }
     }
 
     const {

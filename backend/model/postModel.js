@@ -13,10 +13,10 @@ const postSchema = mongoose.Schema({
     postImage: {
         type: Array
     },
-    comments: {
-        type: Array,
-        ref: 'Comment',
-    }
+    comment: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment'
+    }]
 }, {
     timestamps: true
 })

@@ -2,7 +2,8 @@ const express = require('express');
 const multer = require('multer');
 
 const {
-    addComment
+    addComment,
+    addReplyComment
 } = require('../controllers/commentControllers');
 
 const router = express.Router();
@@ -34,5 +35,6 @@ const upload = multer({
 
 
 router.route('/submitcomment').post(upload.array('commentImage'), addComment);
+router.route('/submitreply').post(upload.array('commentImage'), addReplyComment);
 
 module.exports = router;

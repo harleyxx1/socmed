@@ -9,26 +9,26 @@ const addComment = ansyncHandler(async (req, res) => {
         commentText
     } = req.body;
 
-    const commentImage = [];
-
-    const hostURL = req.protocol + '://' + req.get('host') + '/'
-    
-    if (req.files.length > 0) {
-        req.files.forEach(file => {
-            commentImage.push({
-                "originalname": "IMG_20210103_192151.jpg",
-                "encoding": "7bit",
-                "mimetype": "image/jpeg",
-                "filename": "2021-01-04T12-06-06.961ZIMG_20210103_192151.jpg",
-                "size": 3833758,
-                "url": `${hostURL}${file.filename}`
-            })
-        })
-    }
-
     const post = await Post.findById(postId);
 
-    if (post) {    
+    if (post) {
+        const commentImage = [];
+
+        const hostURL = req.protocol + '://' + req.get('host') + '/'
+        
+        if (req.files.length > 0) {
+            req.files.forEach(file => {
+                commentImage.push({
+                    "originalname": "IMG_20210103_192151.jpg",
+                    "encoding": "7bit",
+                    "mimetype": "image/jpeg",
+                    "filename": "2021-01-04T12-06-06.961ZIMG_20210103_192151.jpg",
+                    "size": 3833758,
+                    "url": `${hostURL}${file.filename}`
+                })
+            })
+        }    
+
         const comment = await Comment.create({
             postId,
             commentedBy,
@@ -37,10 +37,11 @@ const addComment = ansyncHandler(async (req, res) => {
         });
 
         if (comment) {
-            post.comments.push(comment);
+            post.comment.push(comment);
             post.save();
-
-            res.json(post)
+            
+            res.status(201);
+            res.json(comment)
         } else {
             res.status(400);
             throw new Error('Something went wrong.');
@@ -49,8 +50,61 @@ const addComment = ansyncHandler(async (req, res) => {
         res.status(404);
         throw new Error('Post not found.');
     }
+});
+
+const addReplyComment = ansyncHandler(async (req, res) => {
+    const {
+        postId,
+        commentId,
+        commentedBy,
+        commentText
+    } = req.body;
+
+    const parentComment = await Comment.findById(commentId);
+
+    if (parentComment) {
+        const commentImage = [];
+        const hostURL = req.protocol + '://' + req.get('host') + '/'
+        
+        if (req.files.length > 0) {
+            req.files.forEach(file => {
+                commentImage.push({
+                    "originalname": "IMG_20210103_192151.jpg",
+                    "encoding": "7bit",
+                    "mimetype": "image/jpeg",
+                    "filename": "2021-01-04T12-06-06.961ZIMG_20210103_192151.jpg",
+                    "size": 3833758,
+                    "url": `${hostURL}${file.filename}`
+                })
+            })
+        }
+
+        const comment = await Comment.create({
+            postId,
+            commentParentId: commentId,
+            commentedBy,
+            commentText,
+            commentImage,
+            isReply: true
+        });
+
+        if (comment) {
+            parentComment.replies.push(comment);
+            parentComment.save();
+
+            res.status(201);
+            res.json(comment);
+        }else {
+            res.status(400);
+            throw new Error('Something went wrong.');
+        }
+    }else {
+        res.status(404);
+        throw new Error('Comment not found.');
+    }
 })
 
 module.exports = {
-    addComment
+    addComment,
+    addReplyComment
 }

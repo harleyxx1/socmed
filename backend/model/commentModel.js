@@ -18,10 +18,17 @@ const commentSchema = mongoose.Schema({
     commentImage: {
         type: Array,
     },
-    commentParrentId: {
+    commentParentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment'
-    }
+    },
+    isReply: {
+        type: Boolean
+    },
+    replies: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment'
+    }]
 }, {
     timestamps: true
 })

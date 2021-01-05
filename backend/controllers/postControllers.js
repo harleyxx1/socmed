@@ -1,4 +1,5 @@
 const Post = require('../model/postModel');
+const Comment = require('../model/commentModel');
 const asyncHandler = require('express-async-handler');
 
 const getAllPosts = asyncHandler(async (req, res) => {
@@ -8,9 +9,15 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
 const getUserPosts = asyncHandler(async (req, res) => {
     const { userId } = req.body;
-    const posts = await Post.find({ postedBy: userId }); 
-    
-    res.json(posts)
+    const posts = await Post.find({ postedBy: userId }).populate({
+        path: 'comment',
+        populate: {
+            path: 'replies',
+            select: '-replies'
+        }
+    });
+
+    res.json(posts)    
 });
 
 const submitPost = asyncHandler(async (req, res) => {
@@ -30,7 +37,7 @@ const submitPost = asyncHandler(async (req, res) => {
                 "url": `${hostURL}${file.filename}`
             })
         })
-    }
+    } 
 
     const post = await Post.create({
         postedBy,

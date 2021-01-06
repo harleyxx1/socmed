@@ -11,8 +11,6 @@ const imageFormarter = (file, req) => {
     }
 
     return {
-        "originalname": file.originalname,
-        "encoding": file.encoding,
         "mimetype": file.mimetype,
         "filename": file.filename,
         "size": file.size,

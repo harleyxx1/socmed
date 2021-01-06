@@ -20,7 +20,7 @@ const registerUser = asyncHandler(async (req, res) => {
         let avatar = {};
 
         if (req.file) avatar = imageFormarter(req.file, req)
-    
+
         const createdUser = await User.create({
             age,
             avatar,

@@ -1,5 +1,6 @@
-const express =require('express');
+const express = require('express');
 const multer = require('multer');
+
 const { registerUser, loginUser } = require('../controllers/userControllers');
 
 const router = express.Router();

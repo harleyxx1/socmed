@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 
 const connect = require('./backend/config/db');
-const { errorHandler } = require('./backend/middleware/errorMiddleware');
+const { errorHandler } = require('./backend/middleware/errorMiddlewares');
 const userRoutes = require('./backend/routes/userRoutes');
 const postRoutes = require('./backend/routes/postRoutes');
 const commentRoutes = require('./backend/routes/commentRoutes');

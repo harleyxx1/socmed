@@ -1,6 +1,8 @@
 const Post = require('../model/postModel');
 const asyncHandler = require('express-async-handler');
 
+const { imageFormarter } = require('../utils/formatters');
+
 const getAllPosts = asyncHandler(async (req, res) => {
     const posts = await Post.find({}).populate([
         {
@@ -54,19 +56,10 @@ const getUserPosts = asyncHandler(async (req, res) => {
 const submitPost = asyncHandler(async (req, res) => {
     const { postedBy, postText } = req.body;
     const postImage = [];
-
-    const hostURL = req.protocol + '://' + req.get('host') + '/'
     
     if (req.files.length > 0) {
         req.files.forEach(file => {
-            postImage.push({
-                "originalname": file.originalname,
-                "encoding": file.encoding,
-                "mimetype": file.mimetype,
-                "filename": file.filename,
-                "size": file.size,
-                "url": `${hostURL}${file.filename}`
-            })
+            postImage.push(imageFormarter(file, req))
         })
     } 
 
@@ -85,8 +78,40 @@ const submitPost = asyncHandler(async (req, res) => {
     }
 })
 
+const updatePost = asyncHandler(async (req, res) => {
+    const {
+        postId,
+        postText,
+    } = req.body;
+
+    const post = await Post.findById(postId);
+
+    if (post) {
+        const postImage = [];
+    
+        if (req.files.length > 0) {
+            req.files.forEach(file => {
+                postImage.push(imageFormarter(file, req))
+            })
+        }
+        
+        if (postText) post.postText = postText;
+        post.postImage = postImage;
+
+        post.save();
+        res.status(200);
+        res.json(post);
+    } else {
+        res.status(400)
+        res.json('Bad request')
+    }
+
+    // res.json(post);
+}) 
+
 module.exports = {
     getAllPosts,
     getUserPosts,
-    submitPost
+    submitPost,
+    updatePost
 }

@@ -1,22 +1,9 @@
 const User = require('../model/userModel');
 const asyncHandler = require('express-async-handler');
 
+const { imageFormarter } = require('../utils/formatters');
+
 const registerUser = asyncHandler(async (req, res) => {
-    let avatar = {};
-
-    const hostURL = req.protocol + '://' + req.get('host') + '/'
-
-    if (req.file) {
-        avatar = {
-            "originalname": req.file.originalname,
-            "encoding": req.file.encoding,
-            "mimetype": req.file.mimetype,
-            "filename": req.file.filename,
-            "size": req.file.size,
-            "url": `${hostURL}${req.file.filename}`
-        }
-    }
-
     const {
         age,
         birthday,
@@ -30,6 +17,10 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
+        let avatar = {};
+
+        if (req.file) avatar = imageFormarter(req.file, req)
+    
         const createdUser = await User.create({
             age,
             avatar,

@@ -3,7 +3,8 @@ const multer = require('multer');
 const {
     getAllPosts,
     getUserPosts,
-    submitPost
+    submitPost,
+    updatePost
 } = require('../controllers/postControllers');
 
 const router = express.Router();
@@ -36,5 +37,6 @@ const upload = multer({
 router.route('/').get(getAllPosts)
 router.route('/submitpost').post(upload.array('postImage', 20), submitPost)
 router.route('/userpost').post(getUserPosts)
+router.route('/updatepost').post(upload.array('postImage', 20), updatePost)
 
 module.exports = router

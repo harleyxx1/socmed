@@ -2,6 +2,8 @@ const Comment = require('../model/commentModel');
 const Post = require('../model/postModel');
 const ansyncHandler = require('express-async-handler');
 
+const { imageFormarter } = require('../utils/formatters');
+
 const addComment = ansyncHandler(async (req, res) => {
     const {
         postId,
@@ -13,19 +15,10 @@ const addComment = ansyncHandler(async (req, res) => {
 
     if (post) {
         const commentImage = [];
-
-        const hostURL = req.protocol + '://' + req.get('host') + '/'
         
         if (req.files.length > 0) {
             req.files.forEach(file => {
-                postImage.push({
-                    "originalname": file.originalname,
-                    "encoding": file.encoding,
-                    "mimetype": file.mimetype,
-                    "filename": file.filename,
-                    "size": file.size,
-                    "url": `${hostURL}${file.filename}`
-                })
+                postImage.push(imageFormarter(file, req));
             })
         } 
 
@@ -64,18 +57,10 @@ const addReplyComment = ansyncHandler(async (req, res) => {
 
     if (parentComment) {
         const commentImage = [];
-        const hostURL = req.protocol + '://' + req.get('host') + '/'
         
         if (req.files.length > 0) {
             req.files.forEach(file => {
-                commentImage.push({
-                    "originalname": "IMG_20210103_192151.jpg",
-                    "encoding": "7bit",
-                    "mimetype": "image/jpeg",
-                    "filename": "2021-01-04T12-06-06.961ZIMG_20210103_192151.jpg",
-                    "size": 3833758,
-                    "url": `${hostURL}${file.filename}`
-                })
+                commentImage.push(imageFormarter(file, req))
             })
         }
 
@@ -104,7 +89,39 @@ const addReplyComment = ansyncHandler(async (req, res) => {
     }
 })
 
+const updateComment = ansyncHandler(async (req, res) => {
+    const {
+        commentId,
+        commentText,
+        commentedBy
+    } = req.body;
+
+    const parentComment = await Comment.findById(commentId)
+
+    if (parentComment) {
+        const commentImage = [];
+        
+        if (req.files.length > 0) {
+            req.files.forEach(file => {
+                commentImage.push(imageFormarter(file, req))
+            })
+        }
+
+        parentComment.commentedBy = commentedBy
+        parentComment.commentText = commentText;
+        parentComment.commentImage = commentImage;
+
+        parentComment.save();
+        res.status(200);
+        res.json(parentComment);
+    } else {
+        res.status(404);
+        throw new Error('Comment not found.');
+    }
+})
+
 module.exports = {
     addComment,
-    addReplyComment
+    addReplyComment,
+    updateComment
 }

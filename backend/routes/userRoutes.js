@@ -1,7 +1,11 @@
 const express = require('express');
 const multer = require('multer');
 
-const { registerUser, loginUser } = require('../controllers/userControllers');
+const {
+    registerUser, 
+    loginUser,
+    testApi
+} = require('../controllers/userControllers');
 
 const router = express.Router();
 
@@ -31,6 +35,7 @@ const upload = multer({
 });
 
 router.route('/register').post(upload.single('avatar'), registerUser)
+router.route('/test').post(upload.single('avatar'), testApi)
 router.route('/login').post(loginUser);
 
 module.exports = router;

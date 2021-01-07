@@ -71,7 +71,19 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 })
 
+const testApi = asyncHandler(async (req, res) => {
+    const { avatar } = req.body;
+    
+    res.status(200);
+    res.jason({
+        file1: avatar,
+        file2: req.file,
+        file3: req.files
+    })
+})
+
 module.exports = {
     loginUser,
-    registerUser
+    registerUser,
+    testApi
 }

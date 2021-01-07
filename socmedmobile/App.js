@@ -1,39 +1,46 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList } from 'react-native'
+import { View, Text, FlatList, Button } from 'react-native'
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
+import DocumentPicker from 'react-native-document-picker';
 
 const App = () => {
   const [posts, setPost] = useState([]);
 
   useEffect(() => {
-    axios({
-      method: 'GET',
-      url: 'https://dcsocmed.herokuapp.com/api/posts'
-    }).then(res => setPost(res.data))
+    
   },[])
+
+  const onpress = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.images],
+      }); 
+
+      const form = new FormData();
+      form.append('age', '23');
+      form.append('avatar', res);
+      form.append('birthday', '12/2/2020');
+      form.append('email', 'dingharley123@gmail.com');
+      form.append('password', '123123');
+      form.append('username', 'ley');
+      form.append('firstname', 'ley');
+      form.append('lastname', 'ley');
+
+      axios({
+        method: 'POST',
+        url: 'http://192.168.1.8:5000/api/users/register',
+        data: form, 
+      }).then(res => console.log(res.data)).catch(err => console.log(err))
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
  
   return (
-    <View style={{flex: 1, paddingHorizontal: 5}}>
-      <FlatList
-        data={posts}
-        renderItem={({ index, item }) => (
-          <View key={item._id}>
-            {
-              item.postImage.map(element => (
-                <FastImage
-                    style={{ width: 200, height: 200 }}
-                    source={{
-                        uri: element.url,
-                        priority: FastImage.priority.normal,
-                    }}
-                />
-              ))
-            }
-            <Text style={{color: 'white'}}>{item.postText}</Text>
-          </View>
-        )}
-      />
+    <View style={{ flex: 1, paddingHorizontal: 5 }}>
+      <Button title="press" onPress = {onpress}/>
     </View>
   )
 }

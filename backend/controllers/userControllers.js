@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async (req, res) => {
         if (req.file) {
             avatar = imageFormarter(req.file, req);
 
-            cloudinary.uploader.upload(`./uploads/${avatar.filename}`, async function(error, result) {
+            cloudinary.uploader.upload(avatar.url, async function(error, result) {
                 try {
                     avatar['url'] = result.secure_url
     

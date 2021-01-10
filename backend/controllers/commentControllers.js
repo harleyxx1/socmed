@@ -149,8 +149,7 @@ const addReplyComment = ansyncHandler(async (req, res) => {
 const updateComment = ansyncHandler(async (req, res) => {
     const {
         commentId,
-        commentText,
-        commentedBy
+        commentText
     } = req.body;
 
     const parentComment = await Comment.findById(commentId)
@@ -171,7 +170,6 @@ const updateComment = ansyncHandler(async (req, res) => {
                 if (commentImage.length == req.files.length) {
                     clearInterval(checkImageArray);
 
-                    parentComment.commentedBy = commentedBy
                     parentComment.commentText = commentText;
                     parentComment.commentImage = commentImage;
 
@@ -181,7 +179,6 @@ const updateComment = ansyncHandler(async (req, res) => {
                 }
             }, 100)
         } else {
-            parentComment.commentedBy = commentedBy
             parentComment.commentText = commentText;
 
             parentComment.save();

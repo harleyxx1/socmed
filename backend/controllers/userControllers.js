@@ -1,6 +1,7 @@
 const User = require('../model/userModel');
 const asyncHandler = require('express-async-handler');
-const cloudinary = require('cloudinary').v2;
+
+const { upload } = require('../helpers/cloudinaryHelpers');
 const { imageFormarter } = require('../utils/formatters');
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -22,36 +23,36 @@ const registerUser = asyncHandler(async (req, res) => {
         if (req.file) {
             avatar = imageFormarter(req.file, req);
 
-            cloudinary.uploader.upload(avatar.url, async function(error, result) {
-                try {
-                    avatar['url'] = result.secure_url
+            upload(avatar.url).then(async result => {
+                avatar['url'] = result;
     
-                    const createdUser = await User.create({
-                        age,
-                        avatar,
-                        birthday,
-                        email,
-                        firstname,
-                        lastname,
-                        password,
-                        username
-                    })
+                const createdUser = await User.create({
+                    age,
+                    avatar,
+                    birthday,
+                    email,
+                    firstname,
+                    lastname,
+                    password,
+                    username
+                })
+        
+                res.status(201);
+                res.json({
+                    _id: createdUser._id,
+                    age: createdUser.age,
+                    avatar: createdUser.avatar,
+                    birthday: createdUser.birthday,
+                    email: createdUser.email,
+                    firstname: createdUser.firstname,
+                    lastname: createdUser.lastname,
+                    username: createdUser.username
+                })
+            }).catch(err => {
+                res.status(500);
+                throw new Error(err)
+            })  
             
-                    res.status(201);
-                    res.json({
-                        _id: createdUser._id,
-                        age: createdUser.age,
-                        avatar: createdUser.avatar,
-                        birthday: createdUser.birthday,
-                        email: createdUser.email,
-                        firstname: createdUser.firstname,
-                        lastname: createdUser.lastname,
-                        username: createdUser.username
-                    })
-                } catch (err) {
-                    console.log(err)
-                }
-            });
         } else { 
             const createdUser = await User.create({
                 age,

@@ -2,6 +2,7 @@ const Comment = require('../model/commentModel');
 const Post = require('../model/postModel');
 const ansyncHandler = require('express-async-handler');
 
+const { upload } = require('../helpers/cloudinaryHelpers');
 const { imageFormarter } = require('../utils/formatters');
 
 const addComment = ansyncHandler(async (req, res) => {
@@ -17,27 +18,54 @@ const addComment = ansyncHandler(async (req, res) => {
         const commentImage = [];
         
         if (req.files.length > 0) {
-            req.files.forEach(file => {
-                postImage.push(imageFormarter(file, req));
+            req.files.forEach(async file => {
+                const newFile = imageFormarter(file, req);
+                const image = await upload(newFile.url);
+    
+                newFile['url'] = image;
+                commentImage.push(newFile);
             })
-        } 
 
-        const comment = await Comment.create({
-            postId,
-            commentedBy,
-            commentText,
-            commentImage
-        });
-
-        if (comment) {
-            post.comment.push(comment);
-            post.save();
+            const checkImageArray = setInterval(async () => {
+                if (commentImage.length == req.files.length) {
+                    clearInterval(checkImageArray);
+    
+                    const comment = await Comment.create({
+                        postId,
+                        commentedBy,
+                        commentText,
+                        commentImage
+                    });
             
-            res.status(201);
-            res.json(comment)
+                    if (comment) {
+                        post.comment.push(comment);
+                        post.save();
+                        
+                        res.status(201);
+                        res.json(comment)
+                    } else {
+                        res.status(400);
+                        throw new Error('Something went wrong.');
+                    }
+                }
+            }, 100)
         } else {
-            res.status(400);
-            throw new Error('Something went wrong.');
+            const comment = await Comment.create({
+                postId,
+                commentedBy,
+                commentText
+            });
+    
+            if (comment) {
+                post.comment.push(comment);
+                post.save();
+                
+                res.status(201);
+                res.json(comment)
+            } else {
+                res.status(400);
+                throw new Error('Something went wrong.');
+            }
         }
     } else {
         res.status(404);
@@ -59,29 +87,58 @@ const addReplyComment = ansyncHandler(async (req, res) => {
         const commentImage = [];
         
         if (req.files.length > 0) {
-            req.files.forEach(file => {
-                commentImage.push(imageFormarter(file, req))
+            req.files.forEach(async file => {
+                const newFile = imageFormarter(file, req);
+                const image = await upload(newFile.url);
+    
+                newFile['url'] = image;
+                commentImage.push(newFile);
             })
-        }
 
-        const comment = await Comment.create({
-            postId,
-            commentParentId: commentId,
-            commentedBy,
-            commentText,
-            commentImage,
-            isReply: true
-        });
-
-        if (comment) {
-            parentComment.replies.push(comment);
-            parentComment.save();
-
-            res.status(201);
-            res.json(comment);
-        }else {
-            res.status(400);
-            throw new Error('Something went wrong.');
+            const checkImageArray = setInterval(async () => {
+                if (commentImage.length == req.files.length) {
+                    clearInterval(checkImageArray);
+    
+                    const comment = await Comment.create({
+                        postId,
+                        commentParentId: commentId,
+                        commentedBy,
+                        commentText,
+                        commentImage,
+                        isReply: true
+                    });
+            
+                    if (comment) {
+                        parentComment.replies.push(comment);
+                        parentComment.save();
+            
+                        res.status(201);
+                        res.json(comment);
+                    }else {
+                        res.status(400);
+                        throw new Error('Something went wrong.');
+                    }
+                }
+            }, 100)
+        } else {
+            const comment = await Comment.create({
+                postId,
+                commentParentId: commentId,
+                commentedBy,
+                commentText,
+                isReply: true
+            });
+    
+            if (comment) {
+                parentComment.replies.push(comment);
+                parentComment.save();
+    
+                res.status(201);
+                res.json(comment);
+            }else {
+                res.status(400);
+                throw new Error('Something went wrong.');
+            }
         }
     }else {
         res.status(404);
@@ -102,18 +159,35 @@ const updateComment = ansyncHandler(async (req, res) => {
         const commentImage = [];
         
         if (req.files.length > 0) {
-            req.files.forEach(file => {
-                commentImage.push(imageFormarter(file, req))
-            })
+            req.files.forEach(async file => {
+                const newFile = imageFormarter(file, req);
+                const image = await upload(newFile.url);
+    
+                newFile['url'] = image;
+                commentImage.push(newFile);
+            });
+
+            const checkImageArray = setInterval(async () => {
+                if (commentImage.length == req.files.length) {
+                    clearInterval(checkImageArray);
+
+                    parentComment.commentedBy = commentedBy
+                    parentComment.commentText = commentText;
+                    parentComment.commentImage = commentImage;
+
+                    parentComment.save();
+                    res.status(200);
+                    res.json(parentComment);
+                }
+            }, 100)
+        } else {
+            parentComment.commentedBy = commentedBy
+            parentComment.commentText = commentText;
+
+            parentComment.save();
+            res.status(200);
+            res.json(parentComment);
         }
-
-        parentComment.commentedBy = commentedBy
-        parentComment.commentText = commentText;
-        parentComment.commentImage = commentImage;
-
-        parentComment.save();
-        res.status(200);
-        res.json(parentComment);
     } else {
         res.status(404);
         throw new Error('Comment not found.');

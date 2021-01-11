@@ -4,6 +4,7 @@ const multer = require('multer');
 const {
     addComment,
     addReplyComment,
+    deleteComment,
     updateComment
 } = require('../controllers/commentControllers');
 
@@ -34,7 +35,7 @@ const upload = multer({
     fileFilter: filter
 });
 
-
+router.post('/deletecomment', deleteComment);
 router.route('/submitcomment').post(upload.array('commentImage'), addComment);
 router.route('/submitreply').post(upload.array('commentImage'), addReplyComment);
 router.route('/updatecomment').post(upload.array('commentImage'), updateComment);

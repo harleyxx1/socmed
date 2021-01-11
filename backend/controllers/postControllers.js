@@ -1,8 +1,61 @@
 const Post = require('../model/postModel');
+const Comment = require('../model/commentModel');
 const asyncHandler = require('express-async-handler');
 
 const { upload } = require('../helpers/cloudinaryHelpers');
 const { imageFormarter } = require('../utils/formatters');
+
+const deletePost = asyncHandler(async (req, res) => {
+    const {
+        postId
+    } = req.body;
+
+    const post = await Post.findById(postId);
+
+    if (post) {
+        post.deleted = true;
+        post.save();
+
+        if (post.comment.length > 0) {
+            post.comment.forEach(async commentId => {
+            
+                const comment = await Comment.findOneAndUpdate(
+                    { "_id": commentId },
+                    { "deleted": true },
+                    { new: true }
+                )
+
+                if (comment.replies.length > 0) {
+                    comment.replies.forEach(replyId => {
+                        Comment.findOneAndUpdate(
+                            { "_id": replyId }, 
+                            { "deleted": true }
+                        )
+
+                        res.status(200);
+                        res.json({
+                            message: 'Post is successfully deleted.'
+                        })
+                    })
+                } else {
+                    res.status(200);
+                    res.json({
+                        message: 'Post is successfully deleted.'
+                    })
+                }
+            })
+        } else {
+            res.status(200);
+            res.json({
+                message: 'Post is successfully deleted.'
+            })
+        }
+    }
+    else {
+        res.status(400);
+        throw new Error('Post not found.')
+    }
+});
 
 const getAllPosts = asyncHandler(async (req, res) => {
     const posts = await Post.find({}).populate([
@@ -154,6 +207,7 @@ const updatePost = asyncHandler(async (req, res) => {
 })
 
 module.exports = {
+    deletePost,
     getAllPosts,
     getUserPosts,
     submitPost,

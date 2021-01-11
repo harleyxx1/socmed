@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const commentSchema = mongoose.Schema({
+    deleted: {
+        type: Boolean,
+        default: false,
+    },
     postId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

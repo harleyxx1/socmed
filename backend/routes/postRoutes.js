@@ -4,7 +4,8 @@ const {
     getAllPosts,
     getUserPosts,
     submitPost,
-    updatePost
+    updatePost,
+    deletePost
 } = require('../controllers/postControllers');
 
 const router = express.Router();
@@ -35,8 +36,9 @@ const upload = multer({
 });
 
 router.route('/').get(getAllPosts)
+router.route('/deletepost').post(deletePost)
 router.route('/submitpost').post(upload.array('postImage', 20), submitPost)
-router.route('/userpost').post(getUserPosts)
 router.route('/updatepost').post(upload.array('postImage', 20), updatePost)
+router.route('/userpost').post(getUserPosts)
 
 module.exports = router

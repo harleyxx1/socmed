@@ -146,6 +146,42 @@ const addReplyComment = ansyncHandler(async (req, res) => {
     }
 })
 
+const deleteComment = ansyncHandler(async (req, res) => {
+    const {
+        commentId
+    } = req.body;
+
+    const comment = await Comment.findById(commentId);
+
+    if (comment) {
+        comment.deleted = true;
+        comment.save();
+
+        if (comment.replies.length > 0) {
+            comment.replies.forEach(async replyId => {
+                await Comment.findOneAndUpdate(
+                    { "_id": replyId },
+                    { "deleted": true },
+                    { new: true }
+                )
+
+                res.status(200);
+                res.json({
+                    message: 'Comment is successfully deleted.'
+                })
+            })
+        } else {
+            res.status(200);
+            res.json({
+                message: 'Comment is successfully deleted.'
+            })
+        }
+    } else {
+        res.status(400);
+        throw new Error('Comment not found.')
+    }
+})
+
 const updateComment = ansyncHandler(async (req, res) => {
     const {
         commentId,
@@ -194,5 +230,6 @@ const updateComment = ansyncHandler(async (req, res) => {
 module.exports = {
     addComment,
     addReplyComment,
+    deleteComment,
     updateComment
 }

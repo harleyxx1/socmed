@@ -58,16 +58,18 @@ const deletePost = asyncHandler(async (req, res) => {
 });
 
 const getAllPosts = asyncHandler(async (req, res) => {
-    const posts = await Post.find({}).populate([
+    const posts = await Post.find({ "deleted": false }).populate([
         {
             path: 'postedBy',
             select: '-password'
         },
         {
             path: 'comment',
+            match: { deleted: false },
             populate: [{
                 path: 'replies',
                 select: '-replies',
+                match: { deleted: false },
                 populate: {
                     path: 'commentedBy',
                     select: '-password'
@@ -83,15 +85,17 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
 const getUserPosts = asyncHandler(async (req, res) => {
     const { postedBy } = req.body;
-    const posts = await Post.find({ postedBy }).populate([
+    const posts = await Post.find({ postedBy, "deleted": false }).populate([
         {
             path: 'postedBy',
             select: '-password'
         },
         {
             path: 'comment',
+            match: { deleted: false },
             populate: [{
                 path: 'replies',
+                match: { deleted: false },
                 select: '-replies',
                 populate: {
                     path: 'commentedBy',

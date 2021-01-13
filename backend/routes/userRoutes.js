@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 
 const {
+    confirmUser,
     registerUser, 
     loginUser
 } = require('../controllers/userControllers');
@@ -33,7 +34,9 @@ const upload = multer({
     fileFilter: filter
 });
 
+router.route('/confirmuser/:token').get(confirmUser);
 router.route('/register').post(upload.single('avatar'), registerUser)
 router.route('/login').post(loginUser);
+
 
 module.exports = router;

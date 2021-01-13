@@ -2,7 +2,30 @@ const User = require('../model/userModel');
 const asyncHandler = require('express-async-handler');
 
 const { upload } = require('../helpers/cloudinaryHelpers');
+const { sendEmail } = require('../helpers/emailerHelpers');
 const { imageFormarter } = require('../utils/formatters');
+const { verifyToken } = require('../helpers/jwtHelpers');
+
+const confirmUser = asyncHandler(async (req, res) => {
+    const token = req.params.token;
+
+    try {
+        const decoded = verifyToken(token);
+        const decodedUser = decoded.user;
+
+        const user = await User.findById(decodedUser);
+
+        if (user && !user.confirmed) {
+            user.confirmed = true;
+            user.save();
+            res.send('Your account is verified.')
+        } else {
+            res.send('Invalid token.')
+        }
+    } catch (err) {
+        res.send('Invalid token.')
+    }
+})
 
 const registerUser = asyncHandler(async (req, res) => {
     const {
@@ -23,7 +46,8 @@ const registerUser = asyncHandler(async (req, res) => {
         if (req.file) {
             avatar = imageFormarter(req.file, req);
 
-            upload(avatar.url).then(async result => {
+            try {
+                const result = await upload(avatar.url);
                 avatar['url'] = result;
     
                 const createdUser = await User.create({
@@ -35,23 +59,22 @@ const registerUser = asyncHandler(async (req, res) => {
                     lastname,
                     password,
                     username
-                })
+                }) 
+
+                const sent = await sendEmail(createdUser);
         
-                res.status(201);
-                res.json({
-                    _id: createdUser._id,
-                    age: createdUser.age,
-                    avatar: createdUser.avatar,
-                    birthday: createdUser.birthday,
-                    email: createdUser.email,
-                    firstname: createdUser.firstname,
-                    lastname: createdUser.lastname,
-                    username: createdUser.username
-                })
-            }).catch(err => {
-                res.status(500);
-                throw new Error(err)
-            })  
+                if (sent) {
+                    res.status(201);
+                    res.json({
+                        message: 'We already sent you email verification.'
+                    })
+                } else {
+                    console.log(sent)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+               
             
         } else { 
             const createdUser = await User.create({
@@ -63,17 +86,17 @@ const registerUser = asyncHandler(async (req, res) => {
                 password,
                 username
             })
-    
-            res.status(201);
-            res.json({
-                _id: createdUser._id,
-                age: createdUser.age,
-                birthday: createdUser.birthday,
-                email: createdUser.email,
-                firstname: createdUser.firstname,
-                lastname: createdUser.lastname,
-                username: createdUser.username
-            })
+
+            const sent = await sendEmail(createdUser);
+        
+            if (sent) {
+                res.status(201);
+                res.json({
+                    message: 'We already sent you email verification.'
+                })
+            } else {
+                console.log(sent)
+            }
         }
     } else {
         res.status(400);
@@ -86,7 +109,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    if (user && (await user.checkPassword(password))) {
+    if (user && (await user.checkPassword(password)) && user.confirmed) {
+        await sendEmail();
+
         res.json({
             _id: user._id,
             age: user.age,
@@ -99,11 +124,12 @@ const loginUser = asyncHandler(async (req, res) => {
         })
     } else {
         res.status(400);
-        throw new Error('Invalid credentials');
+        throw new Error(user.confirmed ? 'Invalid credentials.' : 'Your account is not yet verified.');
     }
 })
 
 module.exports = {
+    confirmUser,
     loginUser,
-    registerUser,
+    registerUser
 }

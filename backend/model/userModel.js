@@ -21,6 +21,10 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    confirmed: {
+        type: Boolean,
+        default: false
+    },
     lastname: {
         type: String,
         required: true

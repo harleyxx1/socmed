@@ -2,11 +2,12 @@ const express = require('express');
 const dotenv = require('dotenv');
 
 const connect = require('./backend/config/db');
-const { errorHandler } = require('./backend/middleware/errorMiddlewares');
 const cloudinaryConnect = require('./backend/config/cloudinary');
 const userRoutes = require('./backend/routes/userRoutes');
 const postRoutes = require('./backend/routes/postRoutes');
 const commentRoutes = require('./backend/routes/commentRoutes');
+
+const { errorHandler } = require('./backend/middleware/errorMiddlewares');
 
 dotenv.config();
 

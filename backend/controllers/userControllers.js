@@ -110,8 +110,6 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.checkPassword(password)) && user.confirmed) {
-        await sendEmail();
-
         res.json({
             _id: user._id,
             age: user.age,

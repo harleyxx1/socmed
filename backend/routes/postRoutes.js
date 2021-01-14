@@ -35,7 +35,7 @@ const upload = multer({
     fileFilter: filter
 });
 
-router.route('/').get(getAllPosts)
+router.route('/').post(getAllPosts)
 router.route('/deletepost').post(deletePost)
 router.route('/submitpost').post(upload.array('postImage', 20), submitPost)
 router.route('/updatepost').post(upload.array('postImage', 20), updatePost)

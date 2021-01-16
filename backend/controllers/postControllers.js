@@ -115,6 +115,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
     result.post_per_page = 10;
     result.post_page = page + 1;
     result.result_count = posts.length;
+    result.total_page = (postCount / 10) % 1 !== 0 ? Math.floor(postCount/10) + 1 : postCount;
     result.data = posts;
 
     res.status(200);
@@ -170,6 +171,7 @@ const getUserPosts = asyncHandler(async (req, res) => {
     result.post_per_page = 10;
     result.post_page = page + 1;
     result.result_count = posts.length;
+    result.total_page = (postCount / 10) % 1 !== 0 ? Math.floor(postCount/10) + 1 : postCount;
     result.data = posts;
 
     res.status(201)

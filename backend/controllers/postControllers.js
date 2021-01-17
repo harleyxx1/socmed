@@ -273,15 +273,11 @@ const updatePost = asyncHandler(async (req, res) => {
                 }
             }, 100)
         } else {
-            if (postImage.length == req.files.length) {
-                clearInterval(checkImageArray);
-
-                if (postText) post.postText = postText;
-
-                post.save();
-                res.status(200);
-                res.json(post);
-            }
+            if (postText) post.postText = postText;
+            
+            post.save();
+            res.status(200);
+            res.json(post);
         }
         
         

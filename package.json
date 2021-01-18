@@ -6,8 +6,8 @@
   "scripts": {
     "web": "npm start --prefix socmedweb",
     "mobile": "react-native run-android socmedmobile",
-    "dev": "concurrently \"npm run server\" \"npm run web\"",
-    "server": "nodemon server"
+    "server": "nodemon server",
+    "dev": "concurrently \"npm run server\" \"npm run web\""
   },
   "author": "Ding Harley Catubag",
   "license": "ISC",

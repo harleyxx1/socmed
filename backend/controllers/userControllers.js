@@ -122,7 +122,7 @@ const loginUser = asyncHandler(async (req, res) => {
         })
     } else {
         res.status(400);
-        throw new Error(user?.confirmed ? 'Invalid credentials.' : 'Your account is not yet verified.');
+        throw new Error(user.confirmed ? 'Invalid credentials.' : 'Your account is not yet verified.');
     }
 })
 

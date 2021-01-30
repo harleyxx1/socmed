@@ -1,15 +1,15 @@
-// const express = require('express');
-// const dotenv = require('dotenv');
+const express = require('express');
+const dotenv = require('dotenv');
 
-// const connect = require('./backend/config/db');
-// const cloudinaryConnect = require('./backend/config/cloudinary');
-// const userRoutes = require('./backend/routes/userRoutes');
-// const postRoutes = require('./backend/routes/postRoutes');
-// const commentRoutes = require('./backend/routes/commentRoutes');
+const connect = require('./backend/config/db');
+const cloudinaryConnect = require('./backend/config/cloudinary');
+const userRoutes = require('./backend/routes/userRoutes');
+const postRoutes = require('./backend/routes/postRoutes');
+const commentRoutes = require('./backend/routes/commentRoutes');
 
 // const { errorHandler } = require('./backend/middleware/errorMiddlewares');
 
-// dotenv.config();
+dotenv.config();
 
 // /**
 //  * This is responsible for connecting server to mongo db.
@@ -43,7 +43,6 @@
 // const PORT = process.env.PORT || 5000;
 // app.listen(PORT, console.log(`App is runing at port ${PORT}`));
 
-const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log(`App is runing at port ${PORT}`));

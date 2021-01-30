@@ -34,12 +34,8 @@ const upload = multer({
     fileFilter: filter
 });
 
-// router.route('/confirmuser/:token').get(confirmUser);
-// router.route('/register').post(upload.single('avatar'), registerUser)
-// router.route('/login').post(loginUser);
-
-router.get('/', (req, res) => {
-    res.send('hehehehe')
-})
+router.route('/confirmuser/:token').get(confirmUser);
+router.route('/register').post(upload.single('avatar'), registerUser)
+router.route('/login').post(loginUser);
 
 module.exports = router;
